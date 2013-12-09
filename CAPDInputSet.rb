@@ -46,17 +46,8 @@ button = TkButton.new(frame1) {
             # puts "afile after gsub #{afile}"
             $filenameset.push(afile)
         }
-        list = TkListbox.new(frame1) do
-            width = 50
-            height = 20
-            selectmode = 'single'
-            bind("<ListboxSelect>") do setcurrentfile end
-            #listvariable = filenameset
-            pack('side'=>'bottom', 'fill'=>'both', 'expand'=>true)
-        end
-        $filenameset.each {|afile| list.insert('end',afile)}
-        #list.selection(list.get(0))
-        #currentfile = list.curselection[0]
+        
+        $filenameset.each {|afile| $list.insert('end',afile)}
     }
 }
 button.pack('side'=>'top')
@@ -64,6 +55,14 @@ button.pack('side'=>'top')
 $currentfile = TkEntry.new(frame1){ text "Selected File" }
 $currentfile.pack('side' => 'top')
 
+$list = TkListbox.new(frame1) do
+    width = 50
+    height = 20
+    selectmode = 'single'
+    bind("<ListboxSelect>") do setcurrentfile end
+    #listvariable = filenameset
+    pack('side'=>'bottom', 'fill'=>'both', 'expand'=>true)
+end
 
 
 $currentfiletext = TkText.new(f1){
