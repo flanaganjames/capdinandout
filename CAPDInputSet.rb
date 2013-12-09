@@ -3,6 +3,34 @@ require 'tk'
 root = TkRoot.new() {
     title "File IO"
     width = 1000
+    height = 1000
+    
+}
+#filenameset = TkVariable.new([])
+$filenameset = []
+$currentfileindex
+files = {}
+
+n = Tk::Tile::Notebook.new(root)do
+    height 110
+    place('height' => 1000, 'width' => 1000, 'x' => 10, 'y' => 10)
+    pack()
+end
+
+f1 = TkFrame.new(n)
+f2 = TkFrame.new(n)
+f3 = TkFrame.new(n)
+
+n.add f1, :text => 'Select'
+n.add f2, :text => 'Text'
+n.add f3, :text => 'Detail'
+
+
+require 'tk'
+
+root = TkRoot.new() {
+    title "File IO"
+    width = 1000
     height = 500
 }
 #filenameset = TkVariable.new([])
