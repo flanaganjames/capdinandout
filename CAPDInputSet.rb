@@ -3,8 +3,8 @@ require 'tk'
 root = TkRoot.new() {
     title "CAPD Input Set"
 }
-#filenameset = TkVariable.new([])
-$filenameset = []
+#$filelistset = TkVariable.new([])
+#$filenameset = []
 $currentfileindex
 files = {}
 
@@ -39,14 +39,20 @@ button = TkButton.new(frame1) {
         filepathset = filestring.split(' ')
         $filepath = "/" + filepathset[0].scan(/\/(.+\/)+/)[0][0]
         #puts "filepath = #{$filepath}"
-        #filenameset = []
+        $filenameset = []
         filepathset.each {|afile|
             # puts "afile before #{afile}"
             afile = afile.gsub("#{$filepath}", "")
             # puts "afile after gsub #{afile}"
             $filenameset.push(afile)
+            #$filenameset << afile
         }
-        
+        #$filelistset = $filenameset
+        #puts "starting list size #{$list.size}"
+        while $list.size > 0 do
+            $list.delete(0)
+            #puts "after delete, list size #{$list.size}"
+        end
         $filenameset.each {|afile| $list.insert('end',afile)}
     }
 }
@@ -60,7 +66,7 @@ $list = TkListbox.new(frame1) do
     height = 20
     selectmode = 'single'
     bind("<ListboxSelect>") do setcurrentfile end
-    #listvariable = filenameset
+    #listvariable = $filelistset
     pack('side'=>'bottom', 'fill'=>'both', 'expand'=>true)
 end
 
