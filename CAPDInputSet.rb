@@ -41,15 +41,18 @@ notebook.add fdetail, :text => 'Detail'
 selectbutton = TkButton.new(frame1) {
     text "Select Files..."
     command {filestring = Tk::getOpenFile({"multiple" => true})
+        filestring = filestring.gsub(' copy', '_copy')
         filepathset = filestring.split(' ')
-        $filepath = "/" + filepathset[0].scan(/\/(.+\/)+/)[0][0]
+        $filepath = filepathset[0].scan(/(\/(.+\/)+)/)[0][0]
+        #$filepath = "/" + filepathset[0].scan(/\/(.+\/)+/)[0][0]
         $selectedpath.value = $filepath
         
-        #puts "filepath = #{$filepath}"
         $filenameset = []
         $selectedfile.value = ""
         $selectedfiletext.value = ""
         filepathset.each {|afile|
+            afile = afile.gsub('_copy', ' copy')
+            afile = afile.gsub('{', '').gsub('}','')  #these brackets are inserted by the Tk::getOpenFile when there is a file name with ' copy' as a part of the name
             # puts "afile before #{afile}"
             afile = afile.gsub("#{$filepath}", "")
             # puts "afile after gsub #{afile}"
