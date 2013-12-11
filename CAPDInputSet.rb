@@ -14,7 +14,7 @@ $currentfileindex
 files = {}
 
 frame1 = TkFrame.new(root) {
-    width = 500
+    width = 1000
     height = 1000
     pack('side'=>'left' )
 }
@@ -43,10 +43,12 @@ selectbutton = TkButton.new(frame1) {
     command {filestring = Tk::getOpenFile({"multiple" => true})
         filepathset = filestring.split(' ')
         $filepath = "/" + filepathset[0].scan(/\/(.+\/)+/)[0][0]
+        $selectedpath.value = $filepath
+        
         #puts "filepath = #{$filepath}"
         $filenameset = []
-        $currentfile.value = ""
-        $currentfiletext.value = ""
+        $selectedfile.value = ""
+        $selectedfiletext.value = ""
         filepathset.each {|afile|
             # puts "afile before #{afile}"
             afile = afile.gsub("#{$filepath}", "")
@@ -65,12 +67,21 @@ selectbutton = TkButton.new(frame1) {
 }
 selectbutton.pack('side'=>'top')
             
-$currentfilelabel = TkLabel.new(frame1){
+$selectedpathlabel = TkLabel.new(frame1){
+    text "File Path"
+    pack('side' => 'top')
+}
+            
+$selectedpath = TkEntry.new(frame1){
+    pack('side' => 'top')
+}
+            
+$selectedfilelabel = TkLabel.new(frame1){
 text "Selected File" 
 pack('side' => 'top')
 }
             
-$currentfile = TkEntry.new(frame1){
+$selectedfile = TkEntry.new(frame1){
 pack('side' => 'top')
 }
 
@@ -84,7 +95,7 @@ $list = TkListbox.new(frame1) do
 end
 
 
-$currentfiletext = TkText.new(ftext){
+$selectedfiletext = TkText.new(ftext){
     width = 250
     height = 20
     pack('side'=>'right', 'fill'=>'both', 'expand'=>true)
@@ -98,36 +109,30 @@ createbutton = TkButton.new(fdetail) {
 createbutton.pack('side'=>'top')
             
             
-$currentfileVersionlabel = TkLabel.new(fdetail){
+$selectedfileVersionlabel = TkLabel.new(fdetail){
                 text "Version : udate this value for a new set with version modified visit #"
                 pack('side' => 'top')
             }
             
-$currentfileVersion = TkEntry.new(fdetail){
+$selectedfileVersion = TkEntry.new(fdetail){
                 pack('side' => 'top')
             }
 
-$currentfileModlabel = TkLabel.new(fdetail){
+$selectedfileModlabel = TkLabel.new(fdetail){
                 text "MOD : enter text to add a unique element to the name of the files"
                 pack('side' => 'top')
             }
             
-$currentfileMod = TkEntry.new(fdetail){
+$selectedfileMod = TkEntry.new(fdetail){
                 pack('side' => 'top')
             }
 
 def setcurrentfile
-    $currentfileindex = list("#{curselection[0]}")[0]  #unbelievable!
-    $currentfile.value = $filenameset[$currentfileindex]
-    afilename = $filepath + $currentfile.value
-    afile = File.open(afilename, "r")
-    $currentfilerows = File.readlines(afilename).map { |line| line.chomp }
-    $\ = "\n"
-    $currentfiletextstring = $currentfilerows.join($\)
-    $currentfiletext.value = $currentfiletextstring
-    
-    extractcurrentfile($currentfiletextstring)
-    
+    $selectedfileindex = list("#{curselection[0]}")[0]  #unbelievable!
+    $selectedfile.value = $filenameset[$selectedfileindex]
+    afilename = $filepath + $selectedfile.value
+    $selectedfiletext.value = getcurrentfilestring(afilename)
+    extractcurrentfile($selectedfiletext.value, $selectedfile.value)
     
     #readclaris($currentfiletextstring)
     
@@ -136,28 +141,36 @@ def setcurrentfile
     #testfile = File.open(testfilename,'w')
     #testfile.syswrite($currentfiletextstring)
 end
+        
+def getcurrentfilestring(afilename)
+    afile = File.open(afilename, "r")
+    currentfilerows = File.readlines(afilename).map { |line| line.chomp }
+    $\ = "\n"
+    return currentfilerows.join($\)
+end
 
-def extractcurrentfile(aString) #puts info in #theFile
+def extractcurrentfile(aString, afilename) #puts info in #theFile
     theString = StringIO.new(string=aString)
     $rows = theString.readlines.map { |line| line }
     $theFile = {}
     $theFile[:size] = $rows.size
-    $theFile[:docname] = $currentfile.value.gsub('_capd.txt','').gsub('._capd.txt','')
+    $theFile[:docname] = afilename.gsub('_capd.txt','').gsub('._capd.txt','')
     $theFile[:mrn] = $rows[0].gsub("mrn=","").chomp
     mrnstring = $theFile[:mrn]
     $theFile[:visit] = $rows[1].gsub("visitcode=","").chomp
     $theFile[:setvisitadd] = $theFile[:visit].gsub(/#{mrnstring}/,"")
     
-    astring = $theFile[:setvisitadd].scan(/@.+@/)[0]
+    astring = $theFile[:setvisitadd].scan(/@..+@/)[0]
+   
     if astring
         $theFile[:setadd] = astring.gsub('@','')
         $theFile[:visitadd] = $theFile[:setvisitadd].gsub(astring, '')
         #$theFile[:visitadd] = $theFile[:setvisitadd]
         else
         $theFile[:setadd] = ""
-        $theFile[:visitadd] = $theFile[:setvisitadd]
+        $theFile[:visitadd] = $theFile[:setvisitadd].gsub('@', '')
     end
-    $currentfileVersion.value = $theFile[:visitadd]
+    $selectedfileVersion.value = $theFile[:visitadd]
     $theFile[:author] = $rows[2].gsub("authorid=","").chomp
     $theFile[:correlationid] = $rows[3].gsub("correlationid=","").chomp
     $theFile[:lastname] = $rows[4].gsub("lastName=","").chomp
@@ -173,18 +186,18 @@ def extractcurrentfile(aString) #puts info in #theFile
 end
 
 def createtestfiles
-    $visitadd = $currentfileVersion.value
-    $createdfiles = []
-    $theMod = $currentfileMod.value
-    $currentfile = 0
-    while $currentfile < $list.size do
-        getcurrentfile
-        afilename = "#{$filepath}#{$theFile[:docname]}#{$theMod}_capd.txt"
-        $createdfiles << afilename
-        afile = File.open(afilename, "w")
+    visitadd = $selectedfileVersion.value
+    theMod = $selectedfileMod.value
+    createdfileindex = 0
+    while createdfileindex < $list.size do
+        initialfilename = $filenameset[createdfileindex]
+        extractcurrentfile(getcurrentfilestring($filepath + initialfilename), initialfilename)
+        newfilename = "#{$filepath}#{$theFile[:docname]}#{theMod}_capd.txt"
+        afile = File.open(newfilename, "w")
+        
         afile.puts("mrn=#{$theFile[:mrn]}\r\n")
         
-        thefullvisit = "#{$theFile[:mrn].chomp}@#{$theFile[:setadd]}@#{$visitadd}"
+        thefullvisit = "#{$theFile[:mrn].chomp}@#{$theFile[:setadd]}@#{visitadd}"
         
         afile.puts("visitcode=#{thefullvisit}\r\n")
         afile.puts("authorid=#{$theFile[:author]}\r\n")
@@ -197,16 +210,17 @@ def createtestfiles
         afile.puts("visitStart=#{$theFile[:visitstart]}\r\n")
         afile.puts("isDiscard=#{$theFile[:discard]}\r\n")
         afile.puts("isPOR=#{$theFile[:por]}\r\n")
-        
-        $theFiletext.each_index {|aindex| $theFiletext[aindex] = $theFiletext[aindex].gsub(/<EncounterId>.+<\/EncounterId>/, "<EncounterId>#{thefullvisit}<\/EncounterId>")}
+        replacmenttext = "<EncounterId>#{thefullvisit}</EncounterId>"
+        $theFiletext.each_index {|aindex| 
+            #puts $theFiletext[aindex]
+            $theFiletext[aindex] = $theFiletext[aindex].gsub(/<EncounterId>.+<\/EncounterId>/, replacmenttext)}
         $theFiletext.each {|aline| afile.puts("#{aline}\r\n")}
         afile.close
-        #send_file(afilename, :disposition => 'attachment')
-        $currentfile = $currentfile + 1
+        createdfileindex = createdfileindex + 1
     end
 end
 
-def readclaris(aString) #results in claris as part of $claris gloabal
+def readclaris(aString) #puts the clarifications in $claris global
 
     doc = REXML::Document.new aString
     themrn = doc.elements["ns2:DqrClarifications/Person/Id"].get_text
