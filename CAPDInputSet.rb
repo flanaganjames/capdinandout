@@ -90,7 +90,7 @@ $currentfiletext = TkText.new(ftext){
     pack('side'=>'right', 'fill'=>'both', 'expand'=>true)
 }
 
-createbutton = TkButton.new(frame1) {
+createbutton = TkButton.new(fdetail) {
     text "Create Updated Version Files..."
     command {createtestfiles
     }
@@ -147,7 +147,7 @@ def extractcurrentfile(aString) #puts info in #theFile
     mrnstring = $theFile[:mrn]
     $theFile[:visit] = $rows[1].gsub("visitcode=","").chomp
     $theFile[:setvisitadd] = $theFile[:visit].gsub(/#{mrnstring}/,"")
-    $currentfileVersion.value = $theFile[:setvisitadd]
+    
     astring = $theFile[:setvisitadd].scan(/@.+@/)[0]
     if astring
         $theFile[:setadd] = astring.gsub('@','')
@@ -157,6 +157,7 @@ def extractcurrentfile(aString) #puts info in #theFile
         $theFile[:setadd] = ""
         $theFile[:visitadd] = $theFile[:setvisitadd]
     end
+    $currentfileVersion.value = $theFile[:visitadd]
     $theFile[:author] = $rows[2].gsub("authorid=","").chomp
     $theFile[:correlationid] = $rows[3].gsub("correlationid=","").chomp
     $theFile[:lastname] = $rows[4].gsub("lastName=","").chomp
