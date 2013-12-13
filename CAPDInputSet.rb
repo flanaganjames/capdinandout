@@ -33,9 +33,11 @@ end
 
 ftext = TkFrame.new(notebook)
 fdetail = TkFrame.new(notebook)
+$fclarifications = TkFrame.new(notebook)
 
 notebook.add ftext, :text => 'Text'
 notebook.add fdetail, :text => 'Detail'
+notebook.add $fclarifications, :text => 'Clarifications'
 
 
 selectbutton = TkButton.new(frame1) {
@@ -89,7 +91,7 @@ pack('side' => 'top')
 }
 
 $list = TkListbox.new(frame1) do
-    width = 50
+    width = 1000
     height = 20
     selectmode = 'single'
     bind("<ListboxSelect>") do setcurrentfile end
@@ -129,15 +131,24 @@ $selectedfileModlabel = TkLabel.new(fdetail){
 $selectedfileMod = TkEntry.new(fdetail){
                 pack('side' => 'top')
             }
-
+            
+            
 def setcurrentfile
+    
     $selectedfileindex = list("#{curselection[0]}")[0]  #unbelievable!
     $selectedfile.value = $filenameset[$selectedfileindex]
     afilename = $filepath + $selectedfile.value
     $selectedfiletext.value = getcurrentfilestring(afilename)
-    extractcurrentfile($selectedfiletext.value, $selectedfile.value)
-    
-    #readclaris($currentfiletextstring)
+    if $selectedfile.value =~ /.txt/
+        extractcurrentfile($selectedfiletext.value, $selectedfile.value)
+    else
+        $selectedfileVersion.value = ""
+    end
+    if $selectedfile.value =~ /.xml/
+        createclariframes()
+        readclaris($selectedfiletext.value)
+    else
+    end
     
     
     #testfilename = $filepath + "testfile.txt"
@@ -261,6 +272,92 @@ def readclaris(aString) #puts the clarifications in $claris global
         ahash[:systemstatus] = element.elements["ClarificationStatus/SystemStatus"].get_text
         ahash[:documentationText] = element.elements["ClarificationResponse/DocumentationText"].get_text
         $claris << ahash
+        puts "A clarification:"
+        puts ahash
+    }
+    $claris = $claris.sort_by {|aclari| -aclari[:confidence]}
+    displayclaris
+end
+
+def createclariframes()
+        $ffamily = TkFrame.new($fclarifications) {
+            width = 500
+            height = 1000
+            pack('side'=>'left' )
+        }
+        $fkind = TkFrame.new($fclarifications) {
+            width = 500
+            height = 1000
+            pack('side'=>'left' )
+        }
+        $fconfidence = TkFrame.new($fclarifications) {
+            width = 500
+            height = 1000
+            pack('side'=>'left' )
+        }
+        $fuserstatus = TkFrame.new($fclarifications) {
+            width = 500
+            height = 1000
+            pack('side'=>'left' )
+        }
+        $fsystemstatus = TkFrame.new($fclarifications) {
+            width = 500
+            height = 1000
+            pack('side'=>'left' )
+        }
+end
+def destroyclariframes()
+    $ffamily.destroy()
+    $fkind.destroy()
+    $fconfidence.destroy()
+    $fuserstatus.destroy()
+    $fsystemstatus.destroy()
+end
+        
+def displayclaris
+        destroyclariframes()
+        createclariframes()
+        TkLabel.new($ffamily){
+            text "Family"
+            pack('side' => 'top')
+        }
+        TkLabel.new($fkind){
+            text "Kind"
+            pack('side' => 'top')
+        }
+        TkLabel.new($fconfidence){
+            text "Confidence"
+            pack('side' => 'top')
+        }
+        TkLabel.new($fuserstatus){
+            text "UserStatus"
+            pack('side' => 'top')
+        }
+        TkLabel.new($fsystemstatus){
+            text "SystemStatus"
+            pack('side' => 'top')
+        }
+    $claris.each {|ahash|
+        TkLabel.new($ffamily){
+            text ahash[:family]
+            pack('side' => 'top')
+        }
+        TkLabel.new($fkind){
+            text ahash[:kind]
+            pack('side' => 'top')
+        }
+        TkLabel.new($fconfidence){
+            text ahash[:confidence]
+            pack('side' => 'top')
+        }
+        TkLabel.new($fuserstatus){
+            text ahash[:userstatus]
+            pack('side' => 'top')
+        }
+        TkLabel.new($fsystemstatus){
+            text ahash[:systemstatus]
+            pack('side' => 'top')
+        }
     }
 end
 
