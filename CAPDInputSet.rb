@@ -131,11 +131,12 @@ $selectedfileModlabel = TkLabel.new(fdetail){
 $selectedfileMod = TkEntry.new(fdetail){
                 pack('side' => 'top')
             }
-            
+
+#createclariframes()
             
 def setcurrentfile
     
-    $selectedfileindex = list("#{curselection[0]}")[0]  #unbelievable!
+    $selectedfileindex = list("#{curselection[0]}")[0]  #unbelievable!   ? why does this work with list and not $list ?
     $selectedfile.value = $filenameset[$selectedfileindex]
     afilename = $filepath + $selectedfile.value
     $selectedfiletext.value = getcurrentfilestring(afilename)
@@ -145,7 +146,7 @@ def setcurrentfile
         $selectedfileVersion.value = ""
     end
     if $selectedfile.value =~ /.xml/
-        createclariframes()
+
         readclaris($selectedfiletext.value)
     else
     end
@@ -173,17 +174,17 @@ def extractcurrentfile(aString, afilename) #puts info in #theFile
     mrnstring = $theFile[:mrn]
     $theFile[:visit] = $rows[1].gsub("visitcode=","").chomp
     $theFile[:setvisitadd] = $theFile[:visit].gsub(/#{mrnstring}/,"")
-        puts "setvisitadd #{$theFile[:setvisitadd]}"
+        #puts "setvisitadd #{$theFile[:setvisitadd]}"
     astring = $theFile[:setvisitadd].scan(/@.+@/)[0]
-         puts "string #{astring}"
+        #puts "string #{astring}"
     if astring
         $theFile[:setadd] = astring.gsub('@','')
         $theFile[:visitadd] = $theFile[:setvisitadd].gsub(astring, '')
-        puts "setadd #{$theFile[:setadd]}"
+        #puts "setadd #{$theFile[:setadd]}"
         #$theFile[:visitadd] = $theFile[:setvisitadd]
         else
         $theFile[:setadd] = ""
-        puts "setadd #{$theFile[:setadd]}"
+        #puts "setadd #{$theFile[:setadd]}"
         $theFile[:visitadd] = $theFile[:setvisitadd].gsub('@', '')
     end
     $selectedfileVersion.value = $theFile[:visitadd]
@@ -282,6 +283,7 @@ def readclaris(aString) #puts the clarifications in $claris global
 end
 
 def createclariframes()
+        puts "creating clari frames"
         $ffamily = TkFrame.new($fclarifications) {
             width = 500
             height = 1000
@@ -309,11 +311,12 @@ def createclariframes()
         }
 end
 def destroyclariframes()
-    $ffamily.destroy()
-    $fkind.destroy()
-    $fconfidence.destroy()
-    $fuserstatus.destroy()
-    $fsystemstatus.destroy()
+    puts "destroying clariframes"
+    $ffamily.destroy() if $ffamily
+    $fkind.destroy() if $fkind
+    $fconfidence.destroy() if $fconfidence
+    $fuserstatus.destroy() if $fuserstatus
+    $fsystemstatus.destroy() if $fsystemstatus
 end
         
 def displayclaris
