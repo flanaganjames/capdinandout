@@ -173,15 +173,17 @@ def extractcurrentfile(aString, afilename) #puts info in #theFile
     mrnstring = $theFile[:mrn]
     $theFile[:visit] = $rows[1].gsub("visitcode=","").chomp
     $theFile[:setvisitadd] = $theFile[:visit].gsub(/#{mrnstring}/,"")
-    
-    astring = $theFile[:setvisitadd].scan(/@..+@/)[0]
-   
+        puts "setvisitadd #{$theFile[:setvisitadd]}"
+    astring = $theFile[:setvisitadd].scan(/@.+@/)[0]
+         puts "string #{astring}"
     if astring
         $theFile[:setadd] = astring.gsub('@','')
         $theFile[:visitadd] = $theFile[:setvisitadd].gsub(astring, '')
+        puts "setadd #{$theFile[:setadd]}"
         #$theFile[:visitadd] = $theFile[:setvisitadd]
         else
         $theFile[:setadd] = ""
+        puts "setadd #{$theFile[:setadd]}"
         $theFile[:visitadd] = $theFile[:setvisitadd].gsub('@', '')
     end
     $selectedfileVersion.value = $theFile[:visitadd]
