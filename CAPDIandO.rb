@@ -283,99 +283,68 @@ def readclaris(aString) #puts the clarifications in $claris global
 end
 
 def createclariframes()
-        puts "creating clari frames"
-        $ffamily = TkFrame.new($fclarifications) {
-            width = 500
+        $fclaris = TkFrame.new($fclarifications) {
+            width = 3500
             height = 1000
             pack('side'=>'left' )
         }
-        $fkind = TkFrame.new($fclarifications) {
-            width = 500
-            height = 1000
-            pack('side'=>'left' )
-        }
-        $fconfidence = TkFrame.new($fclarifications) {
-            width = 500
-            height = 1000
-            pack('side'=>'left' )
-        }
-        $fuserstatus = TkFrame.new($fclarifications) {
-            width = 500
-            height = 1000
-            pack('side'=>'left' )
-        }
-        $fsystemstatus = TkFrame.new($fclarifications) {
-            width = 500
-            height = 1000
-            pack('side'=>'left' )
-            }
-        $fresponse = TkFrame.new($fclarifications) {
-            width = 500
-            height = 1000
-            pack('side'=>'left' )
-        }
-
 end
 def destroyclariframes()
-    puts "destroying clariframes"
-    $ffamily.destroy() if $ffamily
-    $fkind.destroy() if $fkind
-    $fconfidence.destroy() if $fconfidence
-    $fuserstatus.destroy() if $fuserstatus
-    $fsystemstatus.destroy() if $fsystemstatus
-    $fresponse.destroy() if $fresponse
+    $fclaris.destroy() if $fclaris
 end
         
 def displayclaris
         destroyclariframes()
         createclariframes()
-        TkLabel.new($ffamily){
+        TkLabel.new($fclaris){
             text "Family"
-            pack('side' => 'top')
+            grid('row'=>0, 'column'=>0)
         }
-        TkLabel.new($fkind){
+        TkLabel.new($fclaris){
             text "Kind"
-            pack('side' => 'top')
+            grid('row'=>0, 'column'=>1)
         }
-        TkLabel.new($fconfidence){
+        TkLabel.new($fclaris){
             text "Confidence"
-            pack('side' => 'top')
+            grid('row'=>0, 'column'=>2)
         }
-        TkLabel.new($fuserstatus){
+        TkLabel.new($fclaris){
             text "UserStatus"
-            pack('side' => 'top')
+            grid('row'=>0, 'column'=>3)
         }
-        TkLabel.new($fsystemstatus){
+        TkLabel.new($fclaris){
             text "SystemStatus"
-            pack('side' => 'top')
+            grid('row'=>0, 'column'=>4)
         }
-        TkLabel.new($fresponse){
-                text "Response"
-                pack('side' => 'top')
+        TkLabel.new($fclaris){
+            text "Response"
+            grid('row'=>0, 'column'=>5)
         }
+    i = 0
     $claris.each {|ahash|
-        TkLabel.new($ffamily){
+        i += 1
+        TkLabel.new($fclaris){
             text ahash[:family]
-            pack('side' => 'top')
+            grid('row'=>i , 'column'=>0)
         }
-        TkLabel.new($fkind){
+        TkLabel.new($fclaris){
             text ahash[:kind]
-            pack('side' => 'top')
+            grid('row'=>i , 'column'=>1)
         }
-        TkLabel.new($fconfidence){
+        TkLabel.new($fclaris){
             text ahash[:confidence]
-            pack('side' => 'top')
+            grid('row'=>i , 'column'=>2)
         }
-        TkLabel.new($fuserstatus){
+        TkLabel.new($fclaris){
             text ahash[:userstatus]
-            pack('side' => 'top')
+            grid('row'=>i , 'column'=>3)
         }
-        TkLabel.new($fsystemstatus){
+        TkLabel.new($fclaris){
             text ahash[:systemstatus]
-            pack('side' => 'top')
+            grid('row'=>i , 'column'=>4)
         }
-        
-        TkButton.new($fresponse) {
+        if ahash[:confidence] == 3
+            TkButton.new($fclaris) {
                 text "Respond..."
                 command ({ })
                 if ahash[:confidence] == 3
@@ -383,8 +352,9 @@ def displayclaris
                 else
                     state "disabled"
                 end
-                pack('side'=>'top')
+                grid('row'=>i , 'column'=>5)
             }
+        end
     }
 end
 
