@@ -14,20 +14,20 @@ $currentfileindex
 files = {}
 
 frame1 = TkFrame.new(root) {
-    width = 1000
+    width = 1500
     height = 1000
     pack('side'=>'left' )
 }
 
 frame2 = TkFrame.new(root) {
-    width = 2500
+    width = 3500
     height = 1000
     pack('side'=>'right' )
 }
 
 notebook = Tk::Tile::Notebook.new(frame2)do
     #height 110
-    place('height' => 1000, 'width' => 2500, 'x' => 10, 'y' => 10)
+    place('height' => 1000, 'width' => 3500, 'x' => 10, 'y' => 10)
     pack()
 end
 
@@ -91,7 +91,7 @@ pack('side' => 'top')
 }
 
 $list = TkListbox.new(frame1) do
-    width = 1000
+    width = 1500
     height = 20
     selectmode = 'single'
     bind("<ListboxSelect>") do setcurrentfile end
@@ -101,7 +101,7 @@ end
 
 
 $selectedfiletext = TkText.new(ftext){
-    width = 250
+    width = 1500
     height = 20
     pack('side'=>'right', 'fill'=>'both', 'expand'=>true)
 }
@@ -308,7 +308,13 @@ def createclariframes()
             width = 500
             height = 1000
             pack('side'=>'left' )
+            }
+        $fresponse = TkFrame.new($fclarifications) {
+            width = 500
+            height = 1000
+            pack('side'=>'left' )
         }
+
 end
 def destroyclariframes()
     puts "destroying clariframes"
@@ -317,6 +323,7 @@ def destroyclariframes()
     $fconfidence.destroy() if $fconfidence
     $fuserstatus.destroy() if $fuserstatus
     $fsystemstatus.destroy() if $fsystemstatus
+    $fresponse.destroy() if $fresponse
 end
         
 def displayclaris
@@ -342,6 +349,10 @@ def displayclaris
             text "SystemStatus"
             pack('side' => 'top')
         }
+        TkLabel.new($fresponse){
+                text "Response"
+                pack('side' => 'top')
+        }
     $claris.each {|ahash|
         TkLabel.new($ffamily){
             text ahash[:family]
@@ -363,6 +374,17 @@ def displayclaris
             text ahash[:systemstatus]
             pack('side' => 'top')
         }
+        
+        TkButton.new($fresponse) {
+                text "Respond..."
+                command ({ })
+                if ahash[:confidence] == 3
+                    state "normal"
+                else
+                    state "disabled"
+                end
+                pack('side'=>'top')
+            }
     }
 end
 
