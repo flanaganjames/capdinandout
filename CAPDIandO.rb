@@ -238,7 +238,6 @@ def createtestfiles
 end
 
 def readclaris(aString) #puts the clarifications in $claris global
-
     doc = REXML::Document.new aString
     themrn = doc.elements["ns2:DqrClarifications/Person/Id"].get_text
     thevisit = doc.elements["ns2:DqrClarifications/EncounterId"].get_text
@@ -275,8 +274,6 @@ def readclaris(aString) #puts the clarifications in $claris global
         ahash[:systemstatus] = element.elements["ClarificationStatus/SystemStatus"].get_text
         ahash[:documentationText] = element.elements["ClarificationResponse/DocumentationText"].get_text
         $claris << ahash
-        puts "A clarification:"
-        puts ahash
     }
     $claris = $claris.sort_by {|aclari| -aclari[:confidence]}
     displayclaris
@@ -344,18 +341,97 @@ def displayclaris
             grid('row'=>i , 'column'=>4)
         }
         if ahash[:confidence] == 3
+            avalue = i - 1
             TkButton.new($fclaris) {
                 text "Respond..."
-                command ({ })
-                if ahash[:confidence] == 3
-                    state "normal"
-                else
-                    state "disabled"
-                end
+                command {showresponseoptions(avalue)}  #need to pass i as the clariindex
                 grid('row'=>i , 'column'=>5)
             }
         end
     }
+end
+        
+def showresponseoptions(clariindex)
+        $fresponsedialog = TkFrame.new ($fclarifications){
+            width = 500
+            height = 1000
+            pack('side'=>'right' )
+        }
+        $v = TkVariable.new
+        
+        TkRadioButton.new ($fresponsedialog) {
+            text 'SHOWN'
+            variable $v
+            value 'SHOWN'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+        }
+        TkRadioButton.new ($fresponsedialog) {
+            text 'AGREE'
+            variable $v
+            value 'AGREE'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+        }
+        TkRadioButton.new ($fresponsedialog) {
+            text 'ASK_ME_LATER'
+            variable $v
+            value 'ASK_ME_LATER'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+        }
+        TkRadioButton.new ($fresponsedialog) {
+            text 'DOES_NOT_APPLY'
+            variable $v
+            value 'DOES_NOT_APPLY'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+        }
+        TkRadioButton.new ($fresponsedialog) {
+            text 'OTHER'
+            variable $v
+            value 'OTHER'
+            anchor 'w'
+            pack('side' => 'top', 'fill' => 'x')
+        }
+        
+        TkButton.new ($fresponsedialog) {
+            text 'Create File'
+            aresponse = $v
+            command {createresponsefileDQR(clariindex,aresponse)}
+            pack
+        }
+end
+        
+def  createresponsefileDQR(clariindex, aresponse)
+        
+        $fresponsedialog.destroy()
+        afilename = $selectedfile.value.gsub("_capd.xml","")
+        afilename = $filepath + afilename + "-" + aresponse + "_capd.txt"
+        afile = File.open(afilename, "w")
+        afile.puts("mrn=#{$claris[clariindex][:mrn]}")
+        afile.puts("visitcode=#{$claris[clariindex][:visit]}")
+        afile.puts("authorid=")
+        afile.puts("correlationid=")
+        afile.puts("lastName=")
+        afile.puts("firstName=")
+        afile.puts("dateOfBirth=#{$claris[clariindex][:dateofbirth]}")
+        afile.puts("gender=#{$claris[clariindex][:gender]}")
+        afile.puts("visitStart=")
+        afile.puts("isDiscard=")
+        afile.puts("isPOR=")
+        afile.puts("<p:ResolvedDqrClarifications xmlns:p=\"http://www.nuance.com/clu/capd/clarifications/document/dqr/resolved\" xsi:schemaLocation=\"http://www.nuance.com/clu/capd/clarifications/document/dqr/resolved ../../../../clu-capd-model-clarification/src/main/schema/resolved-capd-clarifications-document-dqr.xsd \" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
+        afile.puts("<  EncounterId>#{$claris[clariindex][:visit]}</EncounterId>")
+        afile.puts("<  ResolvedClarification>")
+        afile.puts("    <Document>")
+        afile.puts("      <Id>#{$claris[clariindex][:docid]}</Id>")
+        afile.puts("    </Document>")
+        afile.puts("    <Family>#{$claris[clariindex][:family]}</Family>")
+        afile.puts("    <Kind>#{$claris[clariindex][:kind]}</Kind>")
+        afile.puts("    <ReviewerResponse>#{aresponse}</ReviewerResponse>")
+        afile.puts("   </ResolvedClarification>")
+        afile.puts("  </p:ResolvedDqrClarifications>")
+        afile.close
 end
 
 Tk.mainloop()
