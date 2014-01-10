@@ -214,7 +214,7 @@ def createtestfiles
         
         afile.puts("mrn=#{$theFile[:mrn]}\r\n")
         
-        thefullvisit = "#{$theFile[:mrn].chomp}@#{$theFile[:setadd]}@#{visitadd}"
+        thefullvisit = "#{$theFile[:mrn]}@#{$theFile[:setadd]}@#{visitadd}"
         
         afile.puts("visitcode=#{thefullvisit}\r\n")
         afile.puts("authorid=#{$theFile[:author]}\r\n")
@@ -227,10 +227,8 @@ def createtestfiles
         afile.puts("visitStart=#{$theFile[:visitstart]}\r\n")
         afile.puts("isDiscard=#{$theFile[:discard]}\r\n")
         afile.puts("isPOR=#{$theFile[:por]}\r\n")
-        replacmenttext = "<EncounterId>#{thefullvisit}</EncounterId>"
-        $theFiletext.each_index {|aindex| 
-            #puts $theFiletext[aindex]
-            $theFiletext[aindex] = $theFiletext[aindex].gsub(/<EncounterId>.+<\/EncounterId>/, replacmenttext)}
+        #replacmenttext = "<EncounterId>#{thefullvisit}<\/EncounterId>"
+        $theFiletext.each_index {|aindex| $theFiletext[aindex] = $theFiletext[aindex].gsub(/<EncounterId>.+<\/EncounterId>/, "<EncounterId>#{thefullvisit}<\/EncounterId>")}
         $theFiletext.each {|aline| afile.puts("#{aline}\r\n")}
         afile.close
         createdfileindex = createdfileindex + 1
